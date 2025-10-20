@@ -537,7 +537,7 @@ export const schemaToTypeScript = (schema: PgSchemaInternal, casing: Casing) => 
 			|| Object.keys(table.checkConstraints).length > 0
 		) {
 			statement += ', ';
-			statement += '(table) => [';
+			statement += '(table): any => [';
 			statement += createTableIndexes(table.name, Object.values(table.indexes), casing);
 			statement += createTableFKs(Object.values(table.foreignKeys), schemas, casing);
 			statement += createTablePKs(

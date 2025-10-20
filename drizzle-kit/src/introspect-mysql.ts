@@ -259,7 +259,7 @@ export const schemaToTypeScript = (
 			|| Object.keys(table.checkConstraint).length > 0
 		) {
 			statement += ',\n';
-			statement += '(table) => [';
+			statement += '(table): any => [';
 			statement += createTableIndexes(
 				table.name,
 				Object.values(table.indexes),
