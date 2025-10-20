@@ -366,6 +366,17 @@ export function escapeSingleQuotes(str: string) {
 }
 
 export function unescapeSingleQuotes(str: string, ignoreFirstAndLastChar: boolean) {
+	if (ignoreFirstAndLastChar && str === "''") {
+		 return str;
+	}
 	const regex = ignoreFirstAndLastChar ? /(?<!^)'(?!$)/g : /'/g;
 	return str.replace(/''/g, "'").replace(regex, "\\'");
+}
+
+export function sortObject<T extends Record<any, any>>(obj: T): T {
+	return Object.keys(obj)
+		.sort().reduce((a: any, v) => {
+			a[v] = obj[v];
+			return a;
+		}, {});
 }

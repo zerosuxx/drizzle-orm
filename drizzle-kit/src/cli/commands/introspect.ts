@@ -27,7 +27,7 @@ import {
 	applySingleStoreSnapshotsDiff,
 	applySqliteSnapshotsDiff,
 } from '../../snapshotsDiffer';
-import { prepareOutFolder } from '../../utils';
+import { prepareOutFolder, sortObject } from '../../utils';
 import { Entities } from '../validations/cli';
 import type { Casing, Prefix } from '../validations/common';
 import { GelCredentials } from '../validations/gel';
@@ -834,13 +834,13 @@ export const relationsToTypeScript = (
 
 	const uniqueImports = [...new Set(imports)];
 
-	const importsTs = `import { relations } from "drizzle-orm/relations";\nimport { ${
-		uniqueImports.join(
-			', ',
+	const importsTs = `import { relations } from "drizzle-orm/relations";\nimport {\n\t${
+		uniqueImports.sort().join(
+			',\n\t',
 		)
-	} } from "./schema";\n\n`;
+	}\n} from "./schema";\n\n`;
 
-	const relationStatements = Object.entries(tableRelations).map(
+	const relationStatements = Object.entries(sortObject(tableRelations)).map(
 		([table, relations]) => {
 			const hasOne = relations.some((it) => it.type === 'one');
 			const hasMany = relations.some((it) => it.type === 'many');
@@ -890,7 +890,7 @@ export const relationsToTypeScript = (
 
 			return `export const ${table}Relations = relations(${table}, ({${hasOne ? 'one' : ''}${
 				hasOne && hasMany ? ', ' : ''
-			}${hasMany ? 'many' : ''}}) => ({\n${fields.join('\n')}\n}));`;
+			}${hasMany ? 'many' : ''}}) => ({\n${fields.sort().join('\n')}\n}));`;
 		},
 	);
 
