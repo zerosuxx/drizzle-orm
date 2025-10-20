@@ -1,6 +1,6 @@
 {
-	"name": "drizzle-kit",
-	"version": "0.31.9",
+	"name": "@zerosuxx/drizzle-kit",
+	"version": "0.31.9-1",
 	"homepage": "https://orm.drizzle.team",
 	"keywords": [
 		"drizzle",
@@ -20,7 +20,7 @@
 		"schema"
 	],
 	"publishConfig": {
-		"provenance": true
+		"access": "public"
 	},
 	"repository": {
 		"type": "git",
@@ -40,7 +40,7 @@
 		"build:dev": "rm -rf ./dist && tsx build.dev.ts && tsc -p tsconfig.cli-types.json && chmod +x ./dist/index.cjs",
 		"pack": "cp package.json README.md dist/ && (cd dist && npm pack --pack-destination ..) && rm -f package.tgz && mv *.tgz package.tgz",
 		"tsc": "tsc -p tsconfig.build.json --noEmit",
-		"publish": "npm publish package.tgz"
+		"npmPublish": "npm publish package.tgz"
 	},
 	"dependencies": {
 		"@drizzle-team/brocli": "^0.10.2",
@@ -83,7 +83,7 @@
 		"dockerode": "^4.0.6",
 		"dotenv": "^16.0.3",
 		"drizzle-kit": "0.25.0-b1faa33",
-		"drizzle-orm": "workspace:./drizzle-orm/dist",
+		"drizzle-orm": "../drizzle-orm/dist",
 		"env-paths": "^3.0.0",
 		"esbuild-node-externals": "^1.9.0",
 		"eslint": "^8.57.0",
