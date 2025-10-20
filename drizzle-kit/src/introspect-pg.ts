@@ -302,6 +302,9 @@ function generateIdentityParams(identity: Column['identity']) {
 }
 
 export const paramNameFor = (name: string, schema?: string) => {
+	if (process.env.INTROSPECT_DISABLE_TABLE_SUFFIX == '1') {
+		return name;
+	}
 	const schemaSuffix = schema && schema !== 'public' ? `In${schema.capitalise()}` : '';
 	return `${name}${schemaSuffix}`;
 };
