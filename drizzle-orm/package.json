@@ -1,6 +1,6 @@
 {
-	"name": "drizzle-orm",
-	"version": "0.45.1",
+	"name": "@zerosuxx/drizzle-orm",
+	"version": "0.45.1-1",
 	"description": "Drizzle ORM package for SQL databases",
 	"type": "module",
 	"scripts": {
@@ -10,14 +10,14 @@
 		"test:types": "cd type-tests && tsc",
 		"test": "vitest run",
 		"pack": "(cd dist && npm pack --pack-destination ..) && rm -f package.tgz && mv *.tgz package.tgz",
-		"publish": "npm publish package.tgz"
+		"npmPublish": "npm publish package.tgz"
 	},
 	"main": "./index.cjs",
 	"module": "./index.js",
 	"types": "./index.d.ts",
 	"sideEffects": false,
 	"publishConfig": {
-		"provenance": true
+		"access": "public"
 	},
 	"repository": {
 		"type": "git",
