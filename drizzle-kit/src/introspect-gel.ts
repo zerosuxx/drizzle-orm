@@ -72,7 +72,7 @@ const withCasing = (value: string, casing: Casing) => {
 		return escapeColumnKey(value);
 	}
 	if (casing === 'camel') {
-		return escapeColumnKey(value.camelCase());
+		return escapeColumnKey(toCamelCase(value));
 	}
 
 	assertUnreachable(casing);
@@ -204,6 +204,9 @@ function generateIdentityParams(identity: Column['identity']) {
 }
 
 export const paramNameFor = (name: string, schema?: string) => {
+	if (process.env.INTROSPECT_DISABLE_TABLE_SUFFIX == '1') {
+		return name;
+	}
 	const schemaSuffix = schema && schema !== 'public' ? `In${schema.capitalise()}` : '';
 	return `${name}${schemaSuffix}`;
 };
@@ -421,7 +424,7 @@ export const schemaToTypeScript = (schema: GelSchemaInternal, casing: Casing) =>
 			|| Object.keys(table.checkConstraints).length > 0
 		) {
 			statement += ', ';
-			statement += '(table) => [';
+			statement += '(table): any => [';
 			statement += createTableIndexes(table.name, Object.values(table.indexes), casing);
 			statement += createTableFKs(Object.values(table.foreignKeys), schemas, casing);
 			statement += createTablePKs(

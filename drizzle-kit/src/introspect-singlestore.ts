@@ -119,7 +119,7 @@ const prepareCasing = (casing?: Casing) => (value: string) => {
 		return escapeColumnKey(value);
 	}
 	if (casing === 'camel') {
-		return escapeColumnKey(value.camelCase());
+		return escapeColumnKey(toCamelCase(value));
 	}
 
 	assertUnreachable(casing);
@@ -250,7 +250,7 @@ export const schemaToTypeScript = (
 			|| Object.keys(table.uniqueConstraints).length > 0
 		) {
 			statement += ',\n';
-			statement += '(table) => [';
+			statement += '(table): any => [';
 			statement += createTableIndexes(
 				table.name,
 				Object.values(table.indexes),

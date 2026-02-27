@@ -24,7 +24,7 @@ import {
 	UniqueConstraint,
 } from './serializer/pgSchema';
 import { indexName } from './serializer/pgSerializer';
-import { unescapeSingleQuotes } from './utils';
+import { sortObject, unescapeSingleQuotes } from './utils';
 
 const pgImportsList = new Set([
 	'pgTable',
@@ -170,7 +170,7 @@ const withCasing = (value: string, casing: Casing) => {
 		return escapeColumnKey(value);
 	}
 	if (casing === 'camel') {
-		return escapeColumnKey(value.camelCase());
+		return escapeColumnKey(toCamelCase(value));
 	}
 
 	assertUnreachable(casing);
@@ -302,6 +302,9 @@ function generateIdentityParams(identity: Column['identity']) {
 }
 
 export const paramNameFor = (name: string, schema?: string) => {
+	if (process.env.INTROSPECT_DISABLE_TABLE_SUFFIX == '1') {
+		return name;
+	}
 	const schemaSuffix = schema && schema !== 'public' ? `In${schema.capitalise()}` : '';
 	return `${name}${schemaSuffix}`;
 };
@@ -427,7 +430,7 @@ export const schemaToTypeScript = (schema: PgSchemaInternal, casing: Casing) => 
 		imports.pg.push('pgRole');
 	}
 
-	const enumStatements = Object.values(schema.enums)
+	const enumStatements = Object.values(sortObject(schema.enums))
 		.map((it) => {
 			const enumSchema = schemas[it.schema];
 			// const func = schema || schema === "public" ? "pgTable" : schema;
@@ -443,7 +446,7 @@ export const schemaToTypeScript = (schema: PgSchemaInternal, casing: Casing) => 
 		.join('')
 		.concat('\n');
 
-	const sequencesStatements = Object.values(schema.sequences)
+	const sequencesStatements = Object.values(sortObject(schema.sequences))
 		.map((it) => {
 			const seqSchema = schemas[it.schema];
 			const paramName = paramNameFor(it.name, seqSchema);
@@ -480,7 +483,7 @@ export const schemaToTypeScript = (schema: PgSchemaInternal, casing: Casing) => 
 		.join('')
 		.concat('');
 
-	const schemaStatements = Object.entries(schemas)
+	const schemaStatements = Object.entries(sortObject(schemas))
 		// .filter((it) => it[0] !== "public")
 		.map((it) => {
 			return `export const ${it[1]} = pgSchema("${it[0]}");\n`;
@@ -489,7 +492,7 @@ export const schemaToTypeScript = (schema: PgSchemaInternal, casing: Casing) => 
 
 	const rolesNameToTsKey: Record<string, string> = {};
 
-	const rolesStatements = Object.entries(schema.roles)
+	const rolesStatements = Object.entries(sortObject(schema.roles))
 		.map((it) => {
 			const fields = it[1];
 			rolesNameToTsKey[fields.name] = it[0];
@@ -505,7 +508,7 @@ export const schemaToTypeScript = (schema: PgSchemaInternal, casing: Casing) => 
 		})
 		.join('');
 
-	const tableStatements = Object.values(schema.tables).map((table) => {
+	const tableStatements = Object.values(sortObject(schema.tables)).map((table) => {
 		const tableSchema = schemas[table.schema];
 		const paramName = paramNameFor(table.name, tableSchema);
 
@@ -537,7 +540,7 @@ export const schemaToTypeScript = (schema: PgSchemaInternal, casing: Casing) => 
 			|| Object.keys(table.checkConstraints).length > 0
 		) {
 			statement += ', ';
-			statement += '(table) => [';
+			statement += '(table): any => [';
 			statement += createTableIndexes(table.name, Object.values(table.indexes), casing);
 			statement += createTableFKs(Object.values(table.foreignKeys), schemas, casing);
 			statement += createTablePKs(

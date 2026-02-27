@@ -53,7 +53,7 @@ const withCasing = (value: string, casing?: Casing) => {
 		return escapeColumnKey(value);
 	}
 	if (casing === 'camel') {
-		return escapeColumnKey(value.camelCase());
+		return escapeColumnKey(toCamelCase(value));
 	}
 
 	return value;
@@ -162,7 +162,7 @@ export const schemaToTypeScript = (
 			|| Object.keys(table.checkConstraints).length > 0
 		) {
 			statement += ',\n';
-			statement += '(table) => [';
+			statement += '(table): any => [';
 			statement += createTableIndexes(
 				table.name,
 				Object.values(table.indexes),
